@@ -10,9 +10,9 @@ object HidDescriptors {
     const val REPORT_ID_MOUSE: Byte = 2
     const val REPORT_ID_CONSUMER: Byte = 3
 
-    const val SDP_NAME = "Linkpad"
+    const val SDP_NAME = "PadKeys"
     const val SDP_DESCRIPTION = "Wireless Keyboard & Mouse"
-    const val SDP_PROVIDER = "Linkpad"
+    const val SDP_PROVIDER = "PadKeys"
     // 0xC0 = Combo (Keyboard + Pointing) per HID 1.1 SDP.
     const val SUBCLASS: Byte = 0xC0.toByte()
     const val COUNTRY: Byte = 0x21  // US

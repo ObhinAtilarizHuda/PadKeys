@@ -4,6 +4,8 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,18 +33,27 @@ import androidx.compose.material.icons.outlined.PlayCircleOutline
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Tv
 import androidx.compose.material3.ExperimentalMaterial3Api
+
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import android.app.Activity
+import android.content.pm.ActivityInfo
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,7 +68,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.btremote.app.bluetooth.ConnectionState
 import com.btremote.app.bluetooth.isConnected
 import com.btremote.app.ui.components.ConnectionBar
-import com.btremote.app.ui.screens.airmouse.AirMouseScreen
+
 import com.btremote.app.ui.screens.connect.ConnectScreen
 import com.btremote.app.ui.screens.keyboard.KeyboardScreen
 import com.btremote.app.ui.screens.media.MediaScreen
@@ -74,10 +85,9 @@ import com.btremote.app.ui.theme.NeonGreen
 private enum class Tab(val label: String, val icon: ImageVector, val accentColor: @Composable () -> Color) {
     Touchpad("Pad",      Icons.Outlined.Mouse,            { GlowPrimary }),
     Keyboard("Keys",     Icons.Outlined.Keyboard,         { GlowCyan }),
-    AirMouse("Air",      Icons.Outlined.Navigation,       { GlowPink }),
     Media   ("Media",    Icons.Outlined.PlayCircleOutline, { NeonGreen }),
     TvRemote("TV",       Icons.Outlined.Tv,               { Color(0xFFFFD93D) }),
-    Connect ("Connect",  Icons.Outlined.Bluetooth,        { GlowCyan })
+    Connect ("Pair",     Icons.Outlined.Bluetooth,        { GlowCyan })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,35 +101,69 @@ fun HomeScreen(
     val pairedHistory by viewModel.pairedHistory.collectAsStateWithLifecycle()
     var current     by remember { mutableStateOf(Tab.Touchpad) }
 
+    val context = LocalContext.current
+    DisposableEffect(current) {
+        val activity = context as? Activity
+        if (current == Tab.Keyboard) {
+            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        } else {
+            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
+        onDispose {
+            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
+    }
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        "LINKPAD",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            letterSpacing = 4.sp
+            if (current != Tab.Keyboard) {
+                TopAppBar(
+                    title = {
+                        Text(
+                            "PADKEYS",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                letterSpacing = 4.sp
+                            )
                         )
+                    },
+                    actions = {
+                        IconButton(onClick = onOpenSettings) {
+                            Icon(Icons.Outlined.Settings, "Settings", tint = MaterialTheme.colorScheme.onSurface)
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        titleContentColor = MaterialTheme.colorScheme.primary
                     )
-                },
-                actions = {
-                    IconButton(onClick = onOpenSettings) {
-                        Icon(Icons.Outlined.Settings, "Settings", tint = MaterialTheme.colorScheme.onSurface)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.primary
                 )
-            )
+            }
         },
         bottomBar = {
-            SynthNavBar(
-                current = current,
-                connectionState = state,
-                onSelect = { current = it }
-            )
+            if (current != Tab.Keyboard) {
+                NavigationBar(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 3.dp
+                ) {
+                    Tab.entries.forEach { t ->
+                        val selected = current == t
+                        NavigationBarItem(
+                            selected = selected,
+                            onClick = { current = t },
+                            icon = {
+                                Icon(t.icon, contentDescription = t.label)
+                            },
+                            label = { Text(t.label) },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                                indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+                    }
+                }
+            }
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize()) {
@@ -133,18 +177,18 @@ fun HomeScreen(
                 onSwitchDevice  = { entry -> viewModel.reconnectTo(entry) },
                 onScanRequested = { current = Tab.Connect },
                 onDisconnect    = { viewModel.disconnect() },
-                onForgetDevice  = { entry -> viewModel.forgetDevice(entry) }
+                onForgetDevice  = { entry -> viewModel.forgetDevice(entry) },
+                onBack          = if (current == Tab.Keyboard) { { current = Tab.Touchpad } } else null
             )
             Box(modifier = Modifier.fillMaxSize()) {
                 AnimatedContent(
                     targetState = current,
-                    transitionSpec = { fadeIn(tween(180)) togetherWith fadeOut(tween(120)) },
+                    transitionSpec = { (slideInHorizontally(tween(220)) { it / 6 } + fadeIn(tween(220))) togetherWith (slideOutHorizontally(tween(180)) { -it / 6 } + fadeOut(tween(180))) },
                     label = "tabContent"
                 ) { tab ->
                     when (tab) {
                         Tab.Touchpad -> TouchpadScreen()
                         Tab.Keyboard -> KeyboardScreen()
-                        Tab.AirMouse -> AirMouseScreen()
                         Tab.Media    -> MediaScreen()
                         Tab.TvRemote -> TvRemoteScreen()
                         Tab.Connect  -> ConnectScreen()

@@ -83,7 +83,8 @@ fun ConnectionBar(
     onSwitchDevice: ((PairedDeviceEntry) -> Unit)? = null,
     onScanRequested: (() -> Unit)? = null,
     onDisconnect: (() -> Unit)? = null,
-    onForgetDevice: ((PairedDeviceEntry) -> Unit)? = null
+    onForgetDevice: ((PairedDeviceEntry) -> Unit)? = null,
+    onBack: (() -> Unit)? = null
 ) {
     val connected  = state.isConnected
     var expanded   by remember { mutableStateOf(false) }
@@ -104,9 +105,9 @@ fun ConnectionBar(
 
     val barBorderColor by animateColorAsState(
         targetValue = when {
-            connected -> NeonGreen.copy(alpha = 0.40f)
-            state is ConnectionState.Connecting -> GlowPrimary.copy(alpha = 0.30f)
-            else      -> GlassBorderDark
+            connected -> MaterialTheme.colorScheme.outline
+            state is ConnectionState.Connecting -> MaterialTheme.colorScheme.primary.copy(alpha = 0.30f)
+            else      -> MaterialTheme.colorScheme.outline
         },
         animationSpec = tween(600),
         label = "barBorder"
@@ -141,8 +142,7 @@ fun ConnectionBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(glowBrush)
-                .background(GlassDark)
+                .background(MaterialTheme.colorScheme.surface)
                 .border(
                     width = 1.dp,
                     color = barBorderColor,
@@ -161,15 +161,6 @@ fun ConnectionBar(
                 .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // BUG 28 — Status dot pulses when connecting
-            Box(
-                modifier = Modifier
-                    .size(9.dp)
-                    .clip(CircleShape)
-                    .background(dotColor.copy(alpha = dotAlpha))
-            )
-            Spacer(Modifier.width(10.dp))
-
             Text(
                 text  = label,
                 color = when {
@@ -180,6 +171,12 @@ fun ConnectionBar(
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
                 modifier = Modifier.weight(1f)
             )
+
+            if (onBack != null) {
+                TextButton(onClick = onBack) {
+                    Text("Back", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                }
+            }
 
             // Expand/collapse chevron (when there are options)
             if (connected || pairedHistory.isNotEmpty()) {
@@ -398,7 +395,7 @@ private fun DropdownRow(
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = if (isActive) FontWeight.SemiBold else FontWeight.Normal
                 ),
-                color = if (isActive) NeonGreen else MaterialTheme.colorScheme.onSurface
+                color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
             )
             if (sublabel.isNotBlank()) {
                 Text(

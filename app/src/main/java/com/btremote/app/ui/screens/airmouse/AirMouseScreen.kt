@@ -262,6 +262,26 @@ fun AirMouseScreen(
         }
 
         // ── Click buttons row ──────────────────────────────────────────
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                "Invert axes",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Switch(
+                checked = prefs?.airMouseInvert ?: true,
+                onCheckedChange = { viewModel.setInvert(it) },
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = MaterialTheme.colorScheme.surface,
+                    checkedTrackColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
+
         val buttons = buildList {
             if (showReset)  add("RESET"  to { viewModel.calibrate() })
             if (showLeft)   add("LEFT"   to { viewModel.leftClick() })

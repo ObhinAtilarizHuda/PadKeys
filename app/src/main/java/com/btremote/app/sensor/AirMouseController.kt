@@ -45,6 +45,8 @@ class AirMouseController @Inject constructor(
      * starts/stops/reconfigures the gyro as preferences change.
      */
     fun startWatching() {
+        // Air mouse feature disabled
+        return
         if (prefWatchJob?.isActive == true) return
         prefWatchJob = scope.launch {
             prefs.preferences.collect { p ->
@@ -66,11 +68,26 @@ class AirMouseController @Inject constructor(
             } else {
                 sensor.deltas(sensitivity, invert)
             }
+            var remX = 0f
+            var remY = 0f
+            var smoothX = 0f
+            var smoothY = 0f
             flow.collect { (dx, dy) ->
-                _tilt.value = dx to dy
+                // Low-pass smoothing to reduce micro-jitter
+                smoothX = 0.45f * dx + 0.55f * smoothX
+                smoothY = 0.45f * dy + 0.55f * smoothY
+                _tilt.value = smoothX to smoothY
                 val sender = reportSender
                 if (sender.isReady()) {
-                    sender.queueMouseMove(dx.toInt(), dy.toInt())
+                    val totalX = smoothX + remX
+                    val totalY = smoothY + remY
+                    val ix = totalX.toInt()
+                    val iy = totalY.toInt()
+                    remX = totalX - ix
+                    remY = totalY - iy
+                    if (ix != 0 || iy != 0) {
+                        sender.queueMouseMove(ix, iy)
+                    }
                 }
             }
         }

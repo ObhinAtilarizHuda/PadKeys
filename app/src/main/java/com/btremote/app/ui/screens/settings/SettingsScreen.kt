@@ -75,7 +75,7 @@ import com.btremote.app.data.HostProfile
 import com.btremote.app.data.HostProfilesState
 
 private const val GITHUB_URL = "https://github.com/Devdas-gupta/linkpad"
-private const val DEVELOPER_NAME = "Devdas Kumar"
+
 
 private val tabs = listOf(
     "Controls" to Icons.Outlined.Tune,
@@ -94,58 +94,21 @@ fun SettingsScreen(
 ) {
     val prefs by viewModel.preferences.collectAsStateWithLifecycle()
     val profilesState by viewModel.profilesState.collectAsStateWithLifecycle()
-    var selected by remember { mutableStateOf(0) }
 
-    Column(modifier = modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background)) {
-        ScrollableTabRow(
-            selectedTabIndex = selected,
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            edgePadding = 8.dp
-        ) {
-            tabs.forEachIndexed { idx, (label, icon) ->
-                Tab(
-                    selected = selected == idx,
-                    onClick = { selected = idx },
-                    text = { Text(label, style = MaterialTheme.typography.labelLarge) },
-                    icon = { Icon(icon, label, modifier = Modifier.size(18.dp)) },
-                    selectedContentColor = MaterialTheme.colorScheme.primary,
-                    unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-        val current = prefs
-        Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
-            AnimatedContent(
-                targetState = selected,
-                transitionSpec = {
-                    if (targetState > initialState) {
-                        (slideInHorizontally { it } + fadeIn(tween(220))) togetherWith
-                        (slideOutHorizontally { -it } + fadeOut(tween(180)))
-                    } else {
-                        (slideInHorizontally { -it } + fadeIn(tween(220))) togetherWith
-                        (slideOutHorizontally { it } + fadeOut(tween(180)))
-                    }
-                },
-                label = "settingsTabContent"
-            ) { sel ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .padding(top = 4.dp, bottom = 24.dp)
-                ) {
-                    when (sel) {
-                        0 -> if (current != null) ControlsTab(current, viewModel)
-                        1 -> if (current != null) MouseTab(current, viewModel)
-                        2 -> if (current != null) KeyboardTab(current, viewModel)
-                        3 -> ProfilesTab(profilesState, viewModel)
-                        4 -> if (current != null) DisplayTab(current, viewModel)
-                        5 -> AboutTab()
-                    }
-                }
-            }
-        }
+    val current = prefs
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        if (current != null) ControlsTab(current, viewModel)
+        if (current != null) MouseTab(current, viewModel)
+        if (current != null) KeyboardTab(current, viewModel)
+        ProfilesTab(profilesState, viewModel)
+        if (current != null) DisplayTab(current, viewModel)
+        AboutTab()
     }
 }
 
@@ -206,37 +169,7 @@ private fun MouseTab(p: AppPreferences, vm: SettingsViewModel) {
         )
     }
 
-    SectionLabel("AIR MOUSE")
-    SliderSetting(icon = Icons.Outlined.Mouse, title = "Sensitivity",
-        value = p.airMouseSensitivity, range = 1..20, onChange = vm::setAirMouseSensitivity)
-    DividerThin()
-    SettingRow(icon = Icons.Outlined.Mouse, title = "Air mouse enabled",
-        subtitle = "Use phone tilt to move pointer",
-        trailing = { Toggle(p.airMouseEnabled, vm::setAirMouseEnabled) })
-    DividerThin()
-    SettingRow(icon = Icons.Outlined.Mouse, title = "Reverse direction",
-        subtitle = "Invert tilt for natural feel",
-        trailing = { Toggle(p.airMouseInvert, vm::setAirMouseInvert) })
-    // Only show game mode toggle if the device has the required sensor
-    if (vm.isGameModeAvailable()) {
-        DividerThin()
-        SettingRow(icon = Icons.Outlined.Mouse, title = "Game mode (no drift)",
-            subtitle = "Sensor fusion · drift-free · works on all screens",
-            trailing = { Toggle(p.airMouseGameMode, vm::setAirMouseGameMode) })
-    }
 
-    SectionLabel("AIR MOUSE BUTTONS")
-    SettingRow(icon = Icons.Outlined.Mouse, title = "Show LEFT click",
-        trailing = { Toggle(p.airMouseShowLeft, vm::setAirMouseShowLeft) })
-    DividerThin()
-    SettingRow(icon = Icons.Outlined.Mouse, title = "Show RIGHT click",
-        trailing = { Toggle(p.airMouseShowRight, vm::setAirMouseShowRight) })
-    DividerThin()
-    SettingRow(icon = Icons.Outlined.Mouse, title = "Show MIDDLE click",
-        trailing = { Toggle(p.airMouseShowMiddle, vm::setAirMouseShowMiddle) })
-    DividerThin()
-    SettingRow(icon = Icons.Outlined.Mouse, title = "Show RESET",
-        trailing = { Toggle(p.airMouseShowReset, vm::setAirMouseShowReset) })
 }
 
 @Composable
@@ -484,7 +417,7 @@ private fun AboutTab() {
         ) {
             Column {
                 Text(
-                    "LINKPAD",
+                    "PADKEYS",
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -512,71 +445,14 @@ private fun AboutTab() {
             }
         }
 
-        SectionLabel("DEVELOPER")
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 0.dp)
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.outline,
-                    shape = RoundedCornerShape(16.dp)
-                )
-                .background(
-                    color = MaterialTheme.colorScheme.surface,
-                    shape = RoundedCornerShape(16.dp)
-                )
-                .padding(16.dp)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-                            shape = androidx.compose.foundation.shape.CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        Icons.Outlined.Info,
-                        null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(22.dp)
-                    )
-                }
-                Spacer(Modifier.width(14.dp))
-                Column {
-                    Text(DEVELOPER_NAME, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
-                    Text("Author and maintainer", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-        }
 
         SectionLabel("SOURCE")
         Text(
-            "View the source on GitHub. Open issues for bugs in Touchpad, Home, Media or any other screen.",
+            "Based on Linkpad by Devdas Kumar (MIT).",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(horizontal = 0.dp)
         )
-
-        Button(
-            onClick = {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_URL))
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                runCatching { context.startActivity(intent) }
-            },
-            modifier = Modifier.fillMaxWidth().height(56.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-        ) {
-            GitHubMark(tint = Color.White, size = 22.dp)
-            Spacer(Modifier.width(10.dp))
-            Text("VIEW ON GITHUB", style = MaterialTheme.typography.labelLarge, color = Color.White)
-            Spacer(Modifier.width(8.dp))
-            Icon(Icons.Outlined.OpenInNew, null, tint = Color.White, modifier = Modifier.size(16.dp))
-        }
     }
 }
 
@@ -764,3 +640,4 @@ private fun GitHubMark(tint: Color, size: androidx.compose.ui.unit.Dp) {
         modifier = Modifier.size(size)
     )
 }
+

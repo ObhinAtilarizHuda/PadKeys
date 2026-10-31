@@ -69,8 +69,7 @@ class HidServiceController @Inject constructor(
     }
 
     fun start(backgroundRun: Boolean) {
-        // Start gyro air mouse observer (app-wide, screen-independent)
-        airMouseController.startWatching()
+        // Air mouse feature removed; keep sensor disabled
         val intent = Intent(context, HidService::class.java)
         if (backgroundRun && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent)

@@ -3,20 +3,20 @@ package com.btremote.app.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // ── SoulExtender Synth Dark Palette ──────────────────────────────────────────
-val BackgroundDark       = Color(0xFF04040F)   // near-void deep navy
-val SurfaceDark          = Color(0xFF0A0A20)   // deep indigo glass base
-val SurfaceVariantDark   = Color(0xFF12122E)   // slightly lighter glass
-val GlassDark            = Color(0x14FFFFFF)   // 8% white — glass fill
-val GlassBorderDark      = Color(0x26FFFFFF)   // 15% white — glass rim
-val GlowPrimary          = Color(0xFF7C3AED)   // electric violet
-val GlowCyan             = Color(0xFF06B6D4)   // neon cyan
-val GlowPink             = Color(0xFFEC4899)   // synth magenta
-val NeonGreen            = Color(0xFF00E5A0)   // accent teal-green
-val TextPrimary          = Color(0xFFE8EAFF)   // cool white
-val TextSecondary        = Color(0xFF7A82A8)   // muted slate
-val DividerDark          = Color(0x1AFFFFFF)   // 10% white divider
-val ErrorRed             = Color(0xFFFF4757)   // neon red
-val SuccessGreen         = Color(0xFF00E5A0)   // same as NeonGreen
+val BackgroundDark       = Color(0xFF111318)   // neutral dark gray
+val SurfaceDark          = Color(0xFF1A1C22)   // dark surface
+val SurfaceVariantDark   = Color(0xFF23262F)   // lighter surface
+val GlassDark            = Color(0x0FFFFFFF)   // subtle fill
+val GlassBorderDark      = Color(0x1FFFFFFF)   // subtle border
+val GlowPrimary          = Color(0xFF3B82F6)   // calm blue
+val GlowCyan             = Color(0xFF0EA5E9)   // calm cyan
+val GlowPink             = Color(0xFF8B5CF6)   // calm violet
+val NeonGreen            = Color(0xFF22C55E)   // calm green
+val TextPrimary          = Color(0xFFE8EAED)   // neutral white
+val TextSecondary        = Color(0xFF9AA0A6)   // neutral gray
+val DividerDark          = Color(0x14FFFFFF)   // subtle divider
+val ErrorRed             = Color(0xFFEF4444)   // standard red
+val SuccessGreen         = Color(0xFF22C55E)   // calm green
 
 // ── Glassmorphism gradient helpers ───────────────────────────────────────────
 val GlassGradientTop     = Color(0x20FFFFFF)   // top sheen

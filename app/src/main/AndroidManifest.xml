@@ -5,7 +5,9 @@
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!-- BUG 14: Removed BLUETOOTH_ADVERTISE — it's for BLE advertising, unrelated to HID, Play Store red flag -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
@@ -48,10 +50,10 @@
 
         <!-- Quick Settings Tile (Android 7.0+) -->
         <service
-            android:name=".bluetooth.LinkpadQsTileService"
+            android:name=".bluetooth.PadKeysQsTileService"
             android:exported="true"
             android:icon="@mipmap/ic_launcher"
-            android:label="Linkpad"
+            android:label="PadKeys"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />

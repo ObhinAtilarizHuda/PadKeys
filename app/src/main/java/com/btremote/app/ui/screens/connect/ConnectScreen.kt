@@ -94,10 +94,13 @@ fun ConnectScreen(
         ActivityResultContracts.StartActivityForResult()
     ) { _ -> viewModel.refreshBluetoothEnabled() }
 
+    val discoverableLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { _ -> }
+
     val context = androidx.compose.ui.platform.LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.refreshBluetoothEnabled()
-        // BUG 39 — Check if permissions are already granted at runtime
         permissionGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             androidx.core.content.ContextCompat.checkSelfPermission(
                 context, Manifest.permission.BLUETOOTH_CONNECT
@@ -107,6 +110,15 @@ fun ConnectScreen(
             ) == android.content.pm.PackageManager.PERMISSION_GRANTED
         } else {
             true
+        }
+        if (!permissionGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            scanLauncher.launch(
+                arrayOf(
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            )
         }
     }
     DisposableEffect(Unit) { onDispose { viewModel.stopScan() } }
@@ -129,23 +141,28 @@ fun ConnectScreen(
         }
 
         // ── Scan button with pulsing animation ──
-        ScanButton(
-            scanning = scanning,
-            enabled  = btEnabled,
-            onClick  = {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    // BUG 14 — BLUETOOTH_ADVERTISE removed (unrelated to HID scanning)
-                    scanLauncher.launch(
-                        arrayOf(
-                            Manifest.permission.BLUETOOTH_CONNECT,
-                            Manifest.permission.BLUETOOTH_SCAN
-                        )
-                    )
-                } else {
-                    viewModel.startScan()
-                }
+        Button(
+            onClick = {
+                discoverableLauncher.launch(
+                    Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
+                        putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
+                    }
+                )
             },
-            onStop = viewModel::stopScan
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            shape = RoundedCornerShape(16.dp),
+            enabled = btEnabled,
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+        ) {
+            Icon(Icons.Outlined.BluetoothSearching, null, tint = Color.White)
+            Spacer(Modifier.width(10.dp))
+            Text("MAKE PHONE DISCOVERABLE", style = MaterialTheme.typography.labelLarge, color = Color.White)
+        }
+        Spacer(Modifier.height(8.dp))
+        Text(
+            "PC scans this phone. On Windows: Settings > Bluetooth > Add device. After paired, tap Reconnect below.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         if (state is ConnectionState.Connected) {
@@ -174,39 +191,12 @@ fun ConnectScreen(
             }
         }
 
-        Spacer(Modifier.height(16.dp))
-        SectionLabel("DISCOVERED")
-        Spacer(Modifier.height(8.dp))
-
-        Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
-            if (results.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    if (scanning) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            ScanningRings()
-                            Spacer(Modifier.height(16.dp))
-                            Text(
-                                "Scanning for devices…",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                    } else {
-                        Text(
-                            "No devices found — tap Scan",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-            } else {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(results, key = { it.address }) { device ->
-                        DeviceRow(device, onClick = { viewModel.connect(device) })
-                    }
-                }
-            }
-        }
+        Spacer(Modifier.height(12.dp))
+        Text(
+            "This phone is the device PC scans. No scanning in app.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 

@@ -96,70 +96,10 @@ fun KeyboardScreen(
         modifier = modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(horizontal = 8.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Direct-input-mode banner
-        if (prefs?.directInputMode == true) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
-                    .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
-                    .padding(horizontal = 14.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Icon(
-                    Icons.Outlined.Keyboard,
-                    null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(18.dp)
-                )
-                Text(
-                    "Direct Input Mode — every keystroke is sent immediately as raw HID",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-
-        LiveTypingField(viewModel, context)
-
-        if (showCustomShortcuts) {
-            // ── MY SHORTCUTS — always visible if enabled; shows empty + add chip if none yet ──
-            SectionLabel("MY SHORTCUTS")
-            CustomShortcutRow(
-                shortcuts = customShortcuts,
-                targetOs  = targetOs,
-                onFire    = { viewModel.pressCustomShortcut(it) },
-                onAdd     = { editingShortcut = null; showEditor = true },
-                onEdit    = { editingShortcut = it;  showEditor = true },
-                onDelete  = { viewModel.removeCustomShortcut(it.id) }
-            )
-        }
-
-        if (showShortcutsWin) {
-            SectionLabel("WINDOWS SHORTCUTS")
-            ShortcutChips(viewModel, "windows")
-        }
-        if (showShortcutsMac) {
-            SectionLabel("MACOS SHORTCUTS")
-            ShortcutChips(viewModel, "mac")
-        }
-        if (showFKeys) {
-            SectionLabel("FUNCTION KEYS")
-            FKeyChips(viewModel)
-        }
-        if (showEdit) {
-            SectionLabel("EDIT")
-            EditChips(viewModel)
-        }
-        if (showArrows) {
-            SectionLabel("NAVIGATION")
-            ArrowCluster(viewModel)
-        }
+        QwertyKeyboard(viewModel)
     }
 
     // Custom shortcut editor dialog

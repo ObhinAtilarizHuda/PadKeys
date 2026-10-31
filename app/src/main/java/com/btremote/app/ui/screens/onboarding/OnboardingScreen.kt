@@ -74,7 +74,7 @@ private val pages = listOf(
     OnboardPage(
         icon = Icons.Outlined.PlayCircleOutline,
         iconColor = GlowPrimary,
-        title = "Welcome to Linkpad",
+        title = "Welcome to PadKeys",
         subtitle = "Your phone, your remote",
         detail = "Turn your Android into a wireless keyboard, mouse, and media remote for any Bluetooth device — no extra software needed."
     ),
@@ -83,21 +83,21 @@ private val pages = listOf(
         iconColor = GlowCyan,
         title = "Bluetooth Permissions",
         subtitle = "One-time setup",
-        detail = "Linkpad needs Bluetooth access to connect to your devices. Tap \"Grant\" on the next dialog — permissions are used only for Bluetooth HID control."
+        detail = "PadKeys needs Bluetooth access to connect to your devices. Tap \"Grant\" on the next dialog — permissions are used only for Bluetooth HID control."
     ),
     OnboardPage(
         icon = Icons.Outlined.Bluetooth,
         iconColor = GlowPink,
         title = "Pair Your First Device",
         subtitle = "Mac · PC · iPad · TV",
-        detail = "Open the Connect tab, tap Scan, and select your device. It will appear as \"Linkpad\" in your Bluetooth settings. Accept the pairing — done!"
+        detail = "Open the Connect tab, tap Scan, and select your device. It will appear as \"PadKeys\" in your Bluetooth settings. Accept the pairing - done!"
     ),
     OnboardPage(
         icon = Icons.Outlined.Check,
         iconColor = NeonGreen,
         title = "You're All Set",
         subtitle = "Start controlling",
-        detail = "Use the Touchpad, Keyboard, Air Mouse, Media, or TV Remote tabs. Swipe between them anytime. Enjoy!"
+        detail = "Use the Touchpad, Keyboard, Media, or TV Remote tabs. Swipe between them anytime. Enjoy!"
     )
 )
 
@@ -305,3 +305,4 @@ fun OnboardingScreen(
         }
     }
 }
+

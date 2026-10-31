@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
  */
 @RequiresApi(Build.VERSION_CODES.N)
 @AndroidEntryPoint
-class LinkpadQsTileService : TileService() {
+class PadKeysQsTileService : TileService() {
 
     @Inject lateinit var controller: HidServiceController
 

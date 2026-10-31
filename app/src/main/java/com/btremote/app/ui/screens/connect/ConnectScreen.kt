@@ -142,7 +142,8 @@ fun ConnectScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .padding(horizontal = 16.dp)
+            .padding(top = 12.dp, bottom = 96.dp)
     ) {
         if (!btEnabled) {
             EnableBluetoothCard(onEnable = {
@@ -704,7 +705,6 @@ private fun PairingGuideCard() {
 
 @Composable
 private fun BluetoothNameCard() {
-    val context = LocalContext.current
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -719,22 +719,10 @@ private fun BluetoothNameCard() {
             )
             Spacer(Modifier.height(6.dp))
             Text(
-                "The host pairs with your phone's Bluetooth name, for example \"Galaxy A32\". The HID service name is PadKeys, but pairing uses the phone name. To show as PadKeys, rename the phone in Android Bluetooth settings. This changes the name for all apps, not only PadKeys.",
+                "When pairing, the PC shows your phone's Bluetooth name, not \"PadKeys\". The HID service name is PadKeys, but the device name comes from the phone. This is normal and does not need to be changed.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Spacer(Modifier.height(10.dp))
-            OutlinedButton(
-                onClick = {
-                    runCatching {
-                        context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
-                    }
-                },
-                modifier = Modifier.fillMaxWidth().height(44.dp),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text("OPEN BLUETOOTH SETTINGS", style = MaterialTheme.typography.labelLarge)
-            }
         }
     }
 }

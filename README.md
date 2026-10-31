@@ -4,7 +4,7 @@
 
 PadKeys uses Android's built-in Bluetooth HID Device profile, so the host sees a standard keyboard + mouse combo. No driver, dongle, or companion app is needed on the receiving device.
 
-[Download APK](https://github.com/ObhinAtilarizHuda/PadKeys/releases/latest) · [Latest release](https://github.com/ObhinAtilarizHuda/PadKeys/releases/tag/v1.3.0) · Android 9+
+[Download APK](https://github.com/ObhinAtilarizHuda/PadKeys/releases/latest) · [Latest release](https://github.com/ObhinAtilarizHuda/PadKeys/releases/tag/v1.3.1) · Android 9+
 
 ![Release](https://img.shields.io/github/v/release/ObhinAtilarizHuda/PadKeys?label=release&color=2563EB)
 ![Android](https://img.shields.io/badge/Android-9%2B-3DDC84?logo=android&logoColor=white)

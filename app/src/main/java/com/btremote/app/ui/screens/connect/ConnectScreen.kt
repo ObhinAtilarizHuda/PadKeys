@@ -79,6 +79,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.delay
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.btremote.app.bluetooth.ConnectionState
 import com.btremote.app.bluetooth.DiscoveredDevice
@@ -524,30 +525,50 @@ private fun PermissionDeniedCard() {
 private fun PairingGuideCard() {
     val hosts = listOf("Windows", "Mac", "Android TV", "Fire TV")
     var selectedHost by remember { mutableStateOf(0) }
+    var step by remember { mutableStateOf(0) }
 
-    val transition = rememberInfiniteTransition(label = "pairScene")
-    val progress by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(2600, easing = LinearEasing), RepeatMode.Restart),
-        label = "pairSceneProgress"
-    )
-    val waveScale by transition.animateFloat(
-        initialValue = 0.55f,
-        targetValue = 1.35f,
-        animationSpec = infiniteRepeatable(tween(900, easing = LinearEasing), RepeatMode.Restart),
-        label = "pairWaveScale"
-    )
-    val waveAlpha by transition.animateFloat(
-        initialValue = 0.75f,
-        targetValue = 0f,
-        animationSpec = infiniteRepeatable(tween(900, easing = LinearEasing), RepeatMode.Restart),
-        label = "pairWaveAlpha"
-    )
+    val steps = when (selectedHost) {
+        0 -> listOf(
+            "Tap MAKE PHONE DISCOVERABLE above.",
+            "On Windows: Settings > Bluetooth & devices > Add device > Bluetooth.",
+            "Select PadKeys and accept the pairing request.",
+            "Return here, then tap RECONNECT."
+        )
+        1 -> listOf(
+            "Tap MAKE PHONE DISCOVERABLE above.",
+            "On Mac: System Settings > Bluetooth, then connect to PadKeys.",
+            "Accept the pairing request on the Mac.",
+            "Return here, then tap RECONNECT."
+        )
+        2 -> listOf(
+            "Tap MAKE PHONE DISCOVERABLE above.",
+            "On the TV: Settings > Remote & Accessories > Add accessory.",
+            "Select PadKeys and pair.",
+            "Return here, then tap RECONNECT."
+        )
+        else -> listOf(
+            "Tap MAKE PHONE DISCOVERABLE above.",
+            "On Fire TV: Settings > Controllers & Bluetooth Devices > Other Bluetooth Devices > Add Bluetooth Devices.",
+            "Select PadKeys and pair.",
+            "Return here, then tap RECONNECT."
+        )
+    }
 
-    val phoneOffset = (progress * 54f).toInt()
-    val hostOffset = -(progress * 54f).toInt()
-    val connected = progress > 0.72f
+    LaunchedEffect(selectedHost) {
+        step = 0
+        while (true) {
+            delay(2800)
+            step = (step + 1) % steps.size
+        }
+    }
+
+    val pulse = rememberInfiniteTransition(label = "pairStepPulse")
+    val iconScale by pulse.animateFloat(
+        initialValue = 0.92f,
+        targetValue = 1.08f,
+        animationSpec = infiniteRepeatable(tween(900, easing = LinearEasing), RepeatMode.Reverse),
+        label = "pairStepIconScale"
+    )
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -576,93 +597,70 @@ private fun PairingGuideCard() {
                 }
             }
 
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(12.dp))
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(96.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(42.dp)
-                        .offset(hostOffset.dp, 0.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)),
-                    contentAlignment = Alignment.Center
+            AnimatedContent(
+                targetState = step,
+                transitionSpec = {
+                    (slideInHorizontally { it } + fadeIn(tween(220))) togetherWith
+                        (slideOutHorizontally { -it } + fadeOut(tween(180)))
+                },
+                label = "pairStep"
+            ) { currentStep ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        Icons.Outlined.Tv,
-                        null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-
-                Box(
-                    modifier = Modifier
-                        .size(58.dp)
-                        .scale(waveScale)
-                        .alpha(waveAlpha)
-                        .clip(CircleShape)
-                        .border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
-                )
-
-                Box(
-                    modifier = Modifier
-                        .size(58.dp)
-                        .scale(waveScale * 0.72f)
-                        .alpha(waveAlpha * 0.7f)
-                        .clip(CircleShape)
-                        .border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
-                )
-
-                Box(
-                    modifier = Modifier
-                        .size(42.dp)
-                        .offset((phoneOffset - 54).dp, 0.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        Icons.Outlined.Smartphone,
-                        null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(22.dp)
-                    )
-                }
-
-                if (connected) {
                     Box(
                         modifier = Modifier
-                            .size(30.dp)
+                            .size(52.dp)
+                            .scale(iconScale)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary),
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            Icons.Outlined.CheckCircle,
+                            when (currentStep) {
+                                0 -> Icons.Outlined.Smartphone
+                                1 -> Icons.Outlined.Computer
+                                2 -> Icons.Outlined.Bluetooth
+                                else -> Icons.Outlined.CheckCircle
+                            },
                             null,
-                            tint = Color.White,
-                            modifier = Modifier.size(18.dp)
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(26.dp)
+                        )
+                    }
+                    Spacer(Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            "Step ${currentStep + 1} of ${steps.size}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            steps[currentStep],
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
             }
 
-            Spacer(Modifier.height(8.dp))
-            Text(
-                when (selectedHost) {
-                    0 -> "Make phone discoverable, then pair PadKeys in Windows Bluetooth settings."
-                    1 -> "Make phone discoverable, then connect to PadKeys in Mac Bluetooth settings."
-                    2 -> "Make phone discoverable, then add PadKeys in TV Bluetooth settings."
-                    else -> "Make phone discoverable, then add PadKeys in Fire TV Bluetooth settings."
-                },
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Spacer(Modifier.height(10.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                steps.indices.forEach { index ->
+                    Box(
+                        modifier = Modifier
+                            .size(if (index == step) 18.dp else 8.dp, 8.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(
+                                if (index == step) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.outline
+                            )
+                    )
+                }
+            }
         }
     }
 }

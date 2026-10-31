@@ -8,12 +8,18 @@ import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,11 +42,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Bluetooth
 import androidx.compose.material.icons.outlined.BluetoothDisabled
 import androidx.compose.material.icons.outlined.BluetoothSearching
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Computer
+import androidx.compose.material.icons.outlined.Smartphone
+import androidx.compose.material.icons.outlined.Tv
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -164,6 +175,9 @@ fun ConnectScreen(
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+
+        Spacer(Modifier.height(12.dp))
+        PairingGuideCard()
 
         if (state is ConnectionState.Connected) {
             Spacer(Modifier.height(10.dp))
@@ -495,6 +509,157 @@ private fun PermissionDeniedCard() {
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
                 Text("SETTINGS", style = MaterialTheme.typography.labelLarge, color = Color.White)
+            }
+        }
+    }
+}
+// -- Animated pairing guide ------------------------------------------------
+
+@Composable
+private fun PairingGuideCard() {
+    val hosts = listOf("Windows", "Mac", "Android TV", "Fire TV")
+    var selectedHost by remember { mutableStateOf(0) }
+    var step by remember { mutableStateOf(0) }
+
+    val steps = when (selectedHost) {
+        0 -> listOf(
+            "Tap MAKE PHONE DISCOVERABLE above.",
+            "On Windows: Settings > Bluetooth & devices > Add device > Bluetooth.",
+            "Select PadKeys and accept the pairing request.",
+            "Return here, then tap RECONNECT."
+        )
+        1 -> listOf(
+            "Tap MAKE PHONE DISCOVERABLE above.",
+            "On Mac: System Settings > Bluetooth, then connect to PadKeys.",
+            "Accept the pairing request on the Mac.",
+            "Return here, then tap RECONNECT."
+        )
+        2 -> listOf(
+            "Tap MAKE PHONE DISCOVERABLE above.",
+            "On the TV: Settings > Remote & Accessories > Add accessory.",
+            "Select PadKeys and pair.",
+            "Return here, then tap RECONNECT."
+        )
+        else -> listOf(
+            "Tap MAKE PHONE DISCOVERABLE above.",
+            "On Fire TV: Settings > Controllers & Bluetooth Devices > Other Bluetooth Devices > Add Bluetooth Devices.",
+            "Select PadKeys and pair.",
+            "Return here, then tap RECONNECT."
+        )
+    }
+
+    LaunchedEffect(selectedHost) { step = 0 }
+
+    val pulse = rememberInfiniteTransition(label = "pairPulse")
+    val iconScale by pulse.animateFloat(
+        initialValue = 0.92f,
+        targetValue = 1.08f,
+        animationSpec = infiniteRepeatable(tween(900, easing = LinearEasing), RepeatMode.Reverse),
+        label = "pairIconScale"
+    )
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+    ) {
+        Column(modifier = Modifier.padding(14.dp)) {
+            Text(
+                "HOW TO PAIR",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(Modifier.height(8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                hosts.forEachIndexed { index, host ->
+                    FilterChip(
+                        selected = index == selectedHost,
+                        onClick = { selectedHost = index },
+                        label = { Text(host, style = MaterialTheme.typography.labelSmall) }
+                    )
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+
+            AnimatedContent(
+                targetState = step,
+                transitionSpec = {
+                    (slideInHorizontally { it } + fadeIn(tween(220))) togetherWith
+                        (slideOutHorizontally { -it } + fadeOut(tween(180)))
+                },
+                label = "pairStep"
+            ) { currentStep ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(52.dp)
+                            .scale(iconScale)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            when (currentStep) {
+                                0 -> Icons.Outlined.Smartphone
+                                1 -> Icons.Outlined.Computer
+                                2 -> Icons.Outlined.Bluetooth
+                                else -> Icons.Outlined.CheckCircle
+                            },
+                            null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(26.dp)
+                        )
+                    }
+                    Spacer(Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            "Step ${currentStep + 1} of ${steps.size}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            steps[currentStep],
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(10.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    steps.indices.forEach { index ->
+                        Box(
+                            modifier = Modifier
+                                .size(if (index == step) 18.dp else 8.dp, 8.dp)
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(
+                                    if (index == step) MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.outline
+                                )
+                        )
+                    }
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    TextButton(
+                        onClick = { if (step > 0) step-- },
+                        enabled = step > 0
+                    ) { Text("BACK") }
+                    Button(
+                        onClick = { if (step < steps.lastIndex) step++ },
+                        enabled = step < steps.lastIndex,
+                        shape = RoundedCornerShape(12.dp)
+                    ) { Text("NEXT") }
+                }
             }
         }
     }

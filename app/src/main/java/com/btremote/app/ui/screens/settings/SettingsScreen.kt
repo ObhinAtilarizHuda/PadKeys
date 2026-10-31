@@ -13,6 +13,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -74,7 +75,8 @@ import com.btremote.app.data.AppPreferences
 import com.btremote.app.data.HostProfile
 import com.btremote.app.data.HostProfilesState
 
-private const val GITHUB_URL = "https://github.com/Devdas-gupta/linkpad"
+private const val GITHUB_URL = "https://github.com/ObhinAtilarizHuda"
+private const val PROJECT_URL = "https://github.com/ObhinAtilarizHuda/PadKeys"
 
 
 private val tabs = listOf(
@@ -461,7 +463,47 @@ private fun AboutTab() {
         }
 
 
-        SectionLabel("SOURCE")
+        SectionLabel("GITHUB")
+        Button(
+            onClick = {
+                runCatching {
+                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(PROJECT_URL)))
+                }
+            },
+            modifier = Modifier.fillMaxWidth().height(48.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            )
+        ) {
+            GitHubMark(tint = MaterialTheme.colorScheme.onPrimary, size = 18.dp)
+            Spacer(Modifier.width(8.dp))
+            Text(
+                "VIEW ON GITHUB",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+        }
+        Text(
+            "Project: github.com/ObhinAtilarizHuda/PadKeys",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp)
+        )
+        Text(
+            "Profile: github.com/ObhinAtilarizHuda",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+                .padding(top = 2.dp)
+                .clickable {
+                    runCatching {
+                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_URL)))
+                    }
+                }
+        )
+
+        SectionLabel("CREDITS")
         Text(
             "Based on Linkpad by Devdas Kumar (MIT).",
             style = MaterialTheme.typography.bodySmall,

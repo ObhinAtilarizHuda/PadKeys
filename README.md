@@ -46,6 +46,10 @@ PadKeys turns the phone already in your pocket into an emergency keyboard, prese
 3. Open the APK and install it.
 4. If an older build is already installed with a different signature, uninstall it first.
 
+### Updates
+
+Download the newer APK and install it over the current version. Android keeps app data as long as the package name and signing key stay the same. PadKeys does not update itself; check [Releases](https://github.com/ObhinAtilarizHuda/PadKeys/releases) or use [Obtainium](https://github.com/ImranR98/Obtainium) for update notifications.
+
 ## Pairing
 
 1. Open PadKeys and go to the **Connect** tab.

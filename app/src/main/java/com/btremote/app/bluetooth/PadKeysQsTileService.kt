@@ -85,7 +85,7 @@ class PadKeysQsTileService : TileService() {
             ?.let { runCatching { it.device.name }.getOrNull() } ?: ""
 
         tile.state   = if (connected) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
-        tile.label   = "Linkpad"
+        tile.label   = "PadKeys"
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             tile.subtitle = if (connected) deviceName else "Not connected"
         }

@@ -49,6 +49,10 @@ class HomeViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
+    fun setKeyboardLayout(value: String) {
+        viewModelScope.launch { prefs.setKeyboardLayout(value) }
+    }
+
     fun quickPair() {
         viewModelScope.launch {
             val a    = profileRepo.state.first().active ?: return@launch

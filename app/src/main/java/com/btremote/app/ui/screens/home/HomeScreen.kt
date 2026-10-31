@@ -180,7 +180,11 @@ fun HomeScreen(
                 onScanRequested = { current = Tab.Connect },
                 onDisconnect    = { viewModel.disconnect() },
                 onForgetDevice  = { entry -> viewModel.forgetDevice(entry) },
-                onBack          = if (current == Tab.Keyboard) { { current = Tab.Touchpad } } else null
+                onBack          = if (current == Tab.Keyboard) { { current = Tab.Touchpad } } else null,
+                keyboardLayout  = if (current == Tab.Keyboard) keyboardLayout else null,
+                onKeyboardLayoutChange = if (current == Tab.Keyboard) {
+                    { layout -> viewModel.setKeyboardLayout(layout) }
+                } else null
             )
             Box(modifier = Modifier.fillMaxSize()) {
                 AnimatedContent(

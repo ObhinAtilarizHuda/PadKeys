@@ -51,7 +51,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.btremote.app.bluetooth.ConnectionState
 import com.btremote.app.bluetooth.deviceName
 import com.btremote.app.bluetooth.isConnected
@@ -84,7 +86,9 @@ fun ConnectionBar(
     onScanRequested: (() -> Unit)? = null,
     onDisconnect: (() -> Unit)? = null,
     onForgetDevice: ((PairedDeviceEntry) -> Unit)? = null,
-    onBack: (() -> Unit)? = null
+    onBack: (() -> Unit)? = null,
+    keyboardLayout: String? = null,
+    onKeyboardLayoutChange: ((String) -> Unit)? = null
 ) {
     val connected  = state.isConnected
     var expanded   by remember { mutableStateOf(false) }
@@ -169,8 +173,18 @@ fun ConnectionBar(
                     else -> MaterialTheme.colorScheme.onSurfaceVariant
                 },
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)
             )
+
+            if (keyboardLayout != null && onKeyboardLayoutChange != null) {
+                LayoutToggle(
+                    layout = keyboardLayout,
+                    onChange = onKeyboardLayoutChange
+                )
+                Spacer(Modifier.width(8.dp))
+            }
 
             if (onBack != null) {
                 TextButton(onClick = onBack) {
@@ -234,6 +248,53 @@ fun ConnectionBar(
 // ────────────────────────────────────────────────────────────────────────────
 // Dropdown content
 // ────────────────────────────────────────────────────────────────────────────
+
+@Composable
+private fun LayoutToggle(
+    layout: String,
+    onChange: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .height(30.dp)
+            .clip(RoundedCornerShape(50))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(2.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        LayoutOption("PHONE", "phone", layout, onChange)
+        LayoutOption("LAPTOP", "laptop", layout, onChange)
+    }
+}
+
+@Composable
+private fun LayoutOption(
+    label: String,
+    value: String,
+    selected: String,
+    onChange: (String) -> Unit
+) {
+    val active = selected == value
+    Box(
+        modifier = Modifier
+            .height(26.dp)
+            .clip(RoundedCornerShape(50))
+            .background(if (active) MaterialTheme.colorScheme.primary else Color.Transparent)
+            .pointerInput(value, selected) {
+                detectTapGestures(onTap = { if (!active) onChange(value) })
+            }
+            .padding(horizontal = 7.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = label,
+            color = if (active) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 9.sp,
+            fontWeight = FontWeight.Medium,
+            maxLines = 1
+        )
+    }
+}
 
 @Composable
 private fun DeviceDropdown(

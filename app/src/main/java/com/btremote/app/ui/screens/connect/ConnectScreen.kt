@@ -183,6 +183,9 @@ fun ConnectScreen(
 
         Spacer(Modifier.height(12.dp))
         PairingGuideCard()
+        
+        Spacer(Modifier.height(12.dp))
+        BluetoothNameCard()
 
         if (state is ConnectionState.Connected) {
             Spacer(Modifier.height(10.dp))
@@ -569,6 +572,18 @@ private fun PairingGuideCard() {
         animationSpec = infiniteRepeatable(tween(900, easing = LinearEasing), RepeatMode.Reverse),
         label = "pairStepIconScale"
     )
+    val waveScale by pulse.animateFloat(
+        initialValue = 0.7f,
+        targetValue = 1.35f,
+        animationSpec = infiniteRepeatable(tween(1100, easing = LinearEasing), RepeatMode.Restart),
+        label = "pairStepWaveScale"
+    )
+    val waveAlpha by pulse.animateFloat(
+        initialValue = 0.55f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(tween(1100, easing = LinearEasing), RepeatMode.Restart),
+        label = "pairStepWaveAlpha"
+    )
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -612,24 +627,45 @@ private fun PairingGuideCard() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
-                        modifier = Modifier
-                            .size(52.dp)
-                            .scale(iconScale)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
+                        modifier = Modifier.size(64.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            when (currentStep) {
-                                0 -> Icons.Outlined.Smartphone
-                                1 -> Icons.Outlined.Computer
-                                2 -> Icons.Outlined.Bluetooth
-                                else -> Icons.Outlined.CheckCircle
-                            },
-                            null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(26.dp)
+                        Box(
+                            modifier = Modifier
+                                .size(64.dp)
+                                .scale(waveScale)
+                                .alpha(waveAlpha)
+                                .clip(CircleShape)
+                                .border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
                         )
+                        Box(
+                            modifier = Modifier
+                                .size(64.dp)
+                                .scale(waveScale * 0.68f)
+                                .alpha(waveAlpha * 0.7f)
+                                .clip(CircleShape)
+                                .border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .scale(iconScale)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                when (currentStep) {
+                                    0 -> Icons.Outlined.Smartphone
+                                    1 -> Icons.Outlined.Computer
+                                    2 -> Icons.Outlined.Bluetooth
+                                    else -> Icons.Outlined.CheckCircle
+                                },
+                                null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                     }
                     Spacer(Modifier.width(12.dp))
                     Column(modifier = Modifier.weight(1f)) {
@@ -660,6 +696,44 @@ private fun PairingGuideCard() {
                             )
                     )
                 }
+            }
+        }
+    }
+}
+// -- Bluetooth name info ---------------------------------------------------
+
+@Composable
+private fun BluetoothNameCard() {
+    val context = LocalContext.current
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+    ) {
+        Column(modifier = Modifier.padding(14.dp)) {
+            Text(
+                "BLUETOOTH NAME ON PC",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                "The host pairs with your phone's Bluetooth name, for example \"Galaxy A32\". The HID service name is PadKeys, but pairing uses the phone name. To show as PadKeys, rename the phone in Android Bluetooth settings. This changes the name for all apps, not only PadKeys.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(10.dp))
+            OutlinedButton(
+                onClick = {
+                    runCatching {
+                        context.startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().height(44.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("OPEN BLUETOOTH SETTINGS", style = MaterialTheme.typography.labelLarge)
             }
         }
     }

@@ -26,7 +26,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -73,6 +76,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -515,48 +519,35 @@ private fun PermissionDeniedCard() {
 }
 // -- Animated pairing guide ------------------------------------------------
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun PairingGuideCard() {
     val hosts = listOf("Windows", "Mac", "Android TV", "Fire TV")
     var selectedHost by remember { mutableStateOf(0) }
-    var step by remember { mutableStateOf(0) }
 
-    val steps = when (selectedHost) {
-        0 -> listOf(
-            "Tap MAKE PHONE DISCOVERABLE above.",
-            "On Windows: Settings > Bluetooth & devices > Add device > Bluetooth.",
-            "Select PadKeys and accept the pairing request.",
-            "Return here, then tap RECONNECT."
-        )
-        1 -> listOf(
-            "Tap MAKE PHONE DISCOVERABLE above.",
-            "On Mac: System Settings > Bluetooth, then connect to PadKeys.",
-            "Accept the pairing request on the Mac.",
-            "Return here, then tap RECONNECT."
-        )
-        2 -> listOf(
-            "Tap MAKE PHONE DISCOVERABLE above.",
-            "On the TV: Settings > Remote & Accessories > Add accessory.",
-            "Select PadKeys and pair.",
-            "Return here, then tap RECONNECT."
-        )
-        else -> listOf(
-            "Tap MAKE PHONE DISCOVERABLE above.",
-            "On Fire TV: Settings > Controllers & Bluetooth Devices > Other Bluetooth Devices > Add Bluetooth Devices.",
-            "Select PadKeys and pair.",
-            "Return here, then tap RECONNECT."
-        )
-    }
-
-    LaunchedEffect(selectedHost) { step = 0 }
-
-    val pulse = rememberInfiniteTransition(label = "pairPulse")
-    val iconScale by pulse.animateFloat(
-        initialValue = 0.92f,
-        targetValue = 1.08f,
-        animationSpec = infiniteRepeatable(tween(900, easing = LinearEasing), RepeatMode.Reverse),
-        label = "pairIconScale"
+    val transition = rememberInfiniteTransition(label = "pairScene")
+    val progress by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(tween(2600, easing = LinearEasing), RepeatMode.Restart),
+        label = "pairSceneProgress"
     )
+    val waveScale by transition.animateFloat(
+        initialValue = 0.55f,
+        targetValue = 1.35f,
+        animationSpec = infiniteRepeatable(tween(900, easing = LinearEasing), RepeatMode.Restart),
+        label = "pairWaveScale"
+    )
+    val waveAlpha by transition.animateFloat(
+        initialValue = 0.75f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(tween(900, easing = LinearEasing), RepeatMode.Restart),
+        label = "pairWaveAlpha"
+    )
+
+    val phoneOffset = (progress * 54f).toInt()
+    val hostOffset = -(progress * 54f).toInt()
+    val connected = progress > 0.72f
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -571,96 +562,107 @@ private fun PairingGuideCard() {
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(Modifier.height(8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
                 hosts.forEachIndexed { index, host ->
                     FilterChip(
                         selected = index == selectedHost,
                         onClick = { selectedHost = index },
-                        label = { Text(host, style = MaterialTheme.typography.labelSmall) }
+                        label = { Text(host, maxLines = 1, style = MaterialTheme.typography.labelSmall) }
                     )
                 }
             }
-            Spacer(Modifier.height(12.dp))
 
-            AnimatedContent(
-                targetState = step,
-                transitionSpec = {
-                    (slideInHorizontally { it } + fadeIn(tween(220))) togetherWith
-                        (slideOutHorizontally { -it } + fadeOut(tween(180)))
-                },
-                label = "pairStep"
-            ) { currentStep ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+            Spacer(Modifier.height(14.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(96.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(42.dp)
+                        .offset(hostOffset.dp, 0.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)),
+                    contentAlignment = Alignment.Center
                 ) {
+                    Icon(
+                        Icons.Outlined.Tv,
+                        null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .size(58.dp)
+                        .scale(waveScale)
+                        .alpha(waveAlpha)
+                        .clip(CircleShape)
+                        .border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                )
+
+                Box(
+                    modifier = Modifier
+                        .size(58.dp)
+                        .scale(waveScale * 0.72f)
+                        .alpha(waveAlpha * 0.7f)
+                        .clip(CircleShape)
+                        .border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                )
+
+                Box(
+                    modifier = Modifier
+                        .size(42.dp)
+                        .offset((phoneOffset - 54).dp, 0.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Outlined.Smartphone,
+                        null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+
+                if (connected) {
                     Box(
                         modifier = Modifier
-                            .size(52.dp)
-                            .scale(iconScale)
+                            .size(30.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
+                            .background(MaterialTheme.colorScheme.primary),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            when (currentStep) {
-                                0 -> Icons.Outlined.Smartphone
-                                1 -> Icons.Outlined.Computer
-                                2 -> Icons.Outlined.Bluetooth
-                                else -> Icons.Outlined.CheckCircle
-                            },
+                            Icons.Outlined.CheckCircle,
                             null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(26.dp)
-                        )
-                    }
-                    Spacer(Modifier.width(12.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            "Step ${currentStep + 1} of ${steps.size}",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            steps[currentStep],
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            tint = Color.White,
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }
             }
 
-            Spacer(Modifier.height(10.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    steps.indices.forEach { index ->
-                        Box(
-                            modifier = Modifier
-                                .size(if (index == step) 18.dp else 8.dp, 8.dp)
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(
-                                    if (index == step) MaterialTheme.colorScheme.primary
-                                    else MaterialTheme.colorScheme.outline
-                                )
-                        )
-                    }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    TextButton(
-                        onClick = { if (step > 0) step-- },
-                        enabled = step > 0
-                    ) { Text("BACK") }
-                    Button(
-                        onClick = { if (step < steps.lastIndex) step++ },
-                        enabled = step < steps.lastIndex,
-                        shape = RoundedCornerShape(12.dp)
-                    ) { Text("NEXT") }
-                }
-            }
+            Spacer(Modifier.height(8.dp))
+            Text(
+                when (selectedHost) {
+                    0 -> "Make phone discoverable, then pair PadKeys in Windows Bluetooth settings."
+                    1 -> "Make phone discoverable, then connect to PadKeys in Mac Bluetooth settings."
+                    2 -> "Make phone discoverable, then add PadKeys in TV Bluetooth settings."
+                    else -> "Make phone discoverable, then add PadKeys in Fire TV Bluetooth settings."
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

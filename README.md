@@ -1,186 +1,48 @@
-<p align="center">
-  <img src="assets/banner.png" alt="PadKeys — wireless Bluetooth keyboard, mouse and media remote for Android" />
-</p>
+# PadKeys
 
-<h1 align="center">PadKeys</h1>
-
-<p align="center">
-  <em>Turn your Android phone into a wireless keyboard, mouse, and media remote for any Bluetooth host. No companion app on the target device.</em>
-</p>
-
-<p align="center">
-  <a href="https://play.google.com/store/apps/details?id=com.btremote.app"><img alt="Get it on Google Play" src="https://img.shields.io/badge/Google_Play-Download-3DDC84?logo=google-play&logoColor=white" /></a>
-  <a href="https://www.android.com/"><img alt="Platform" src="https://img.shields.io/badge/platform-Android-3DDC84?logo=android&logoColor=white" /></a>
-  <a href="https://developer.android.com/"><img alt="Min SDK" src="https://img.shields.io/badge/minSdk-28-1976D2" /></a>
-  <a href="https://developer.android.com/"><img alt="Target SDK" src="https://img.shields.io/badge/targetSdk-35-1976D2" /></a>
-  <a href="https://kotlinlang.org/"><img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-Compose-7F52FF?logo=kotlin&logoColor=white" /></a>
-  <a href="https://github.com/ObhinAtilarizHuda/PadKeys/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/ObhinAtilarizHuda/PadKeys?color=00E5C3&label=release" /></a>
-  <a href="#license"><img alt="License" src="https://img.shields.io/badge/license-MIT-lightgrey" /></a>
-</p>
-
----
-
-## Download
-
-<p align="center">
-  <a href="https://play.google.com/store/apps/details?id=com.btremote.app">
-    <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80"/>
-  </a>
-</p>
-
-Or grab the latest APK directly from [GitHub Releases](https://github.com/ObhinAtilarizHuda/PadKeys/releases/latest).
-
----
-
-## Overview
-
-**PadKeys** is a Bluetooth HID controller built natively for Android. It pairs with any host that supports Classic Bluetooth — macOS, Windows, Linux, iPadOS, Android TV, and most smart TVs — and shows up as a generic combo keyboard + mouse. The host doesn't need any driver, helper app, or pairing code beyond the standard Bluetooth flow.
-
-Use it as a silent remote for your living-room TV, a backup keyboard when yours dies mid-meeting, or a desk-side trackpad when you want your laptop closed.
-
----
+PadKeys turns an Android phone into a Bluetooth HID keyboard and mouse for any host (PC, Mac, Linux, iPad, Android TV, smart TV). No companion app is required on the host.
 
 ## Features
 
-- **Touchpad** — laptop-class trackpad with 1-finger move, 2-finger scroll (vertical + horizontal AC Pan), 2-finger tap right-click, tap-to-drag, and a precision right-edge scroll strip.
-- **Software keyboard** — relays your typing to the host in real time. Optional Shortcuts row (Cmd / Ctrl + C/V/X/Z/A, Alt+Tab), F-keys, Edit cluster (Backspace / Del / Home / End / PgUp / PgDn / Insert), and Arrow cluster.
-- **Media remote** — brightness, volume, mute, prev/next track, play/pause, plus press-and-hold FF/RW for continuous seeking.
-- **TV Remote** — dedicated tab with D-Pad ring, system keys (Back / Home / Menu), volume & channel controls, colour function keys (F1–F4), Power & Input/Source buttons, and a numeric keypad.
-- **Multi-host profiles** — save Mac / PC / iPad / TV profiles, each with its own target-OS layout and last-connected device. Switch in one tap.
-- **Quick Settings Tile** — connect or reconnect directly from the Android notification shade.
-- **Device Switcher Dropdown** — one-tap switch between paired hosts with Disconnect and Forget-device options.
-- **Themed UI** — SoulExtender Synth glassmorphic dark theme with electric violet, neon cyan, and synth magenta accents. Light / dark / system toggle.
+- Touchpad mode: move, left/right click, scroll
+- Full QWERTY keyboard (F1-F12, numbers, symbols, modifiers, arrows) in landscape
+- Bluetooth HID (Classic) pairing; auto-reconnect to last host
+- Material 3 UI with dynamic color (Material You)
+- Portrait by default, landscape only in keyboard mode
+- No internet permission; local Bluetooth only
 
----
+## Requirements
 
-See [changelog.md](changelog.md) for the full detailed changelog.
-
----
-
-## Screens
-
-| Touchpad | Keyboard |
-| :-: | :-: | :-: |
-| Trackpad surface + edge scroll strip | Live typing relay + chip rows | Gyro cursor visualizer + click row |
-
-| Media | TV Remote | Connect | Settings |
-| :-: | :-: | :-: | :-: |
-| Brightness / volume / transport | D-Pad + numpad + system keys | Scan + paired history | Profiles, OS, theme, About |
-
----
+- Android 9+ (API 28)
+- Bluetooth classic
+- Host supporting Bluetooth HID input
 
 ## Build
 
-### Android Studio (recommended)
-
-1. **File → Open** and select the project root.
-2. When prompted "Gradle Wrapper not found", choose **OK / Use Gradle from gradle-wrapper.properties**.
-3. Studio downloads everything. Hit **Run**.
-
-### Terminal
-
-Make sure you have JDK 17+ installed, then build the debug APK using:
-
-```sh
+```bash
 ./gradlew assembleDebug
 ```
 
-### Variants
+APK output: `app/build/outputs/apk/debug/app-debug.apk`
 
-| Command | Output |
-| --- | --- |
-| `./gradlew assembleDebug` | `app-debug.apk` (`com.btremote.app.debug` suffix) |
-| `./gradlew assembleRelease` | R8-shrunk signed release APK |
-| `./gradlew bundleRelease` | AAB for Play Store |
-| `./gradlew lint` | Lint report |
-| `./gradlew test` | Unit tests |
-
----
-
-## Pair with a host
-
-1. Make the phone discoverable (Connect tab -> "MAKE PHONE DISCOVERABLE").
-2. On the host (PC/TV), scan Bluetooth and pair with "PadKeys" (POCO C71 etc.).
-3. In PadKeys, tap Reconnect to the paired host. Done.
-
-
-After pairing, PadKeys auto-reconnects to the last host when possible.
-
-### Tested hosts
-
-- macOS 12+
-- Windows 10 / 11
-- Linux (BlueZ 5.50+)
-- iPadOS / iOS 14+
-- Android TV / Google TV
-- Most smart TVs (LG, Samsung) accept it as a BT keyboard
-
-> **Not supported:** Android phones as the *host*. Stock and skinned Android (MIUI / One UI / ColorOS) filters out HID-Combo from another phone. Not fixable app-side.
-
----
-
-## Tech stack
-
-- **Kotlin** + **Jetpack Compose** (no XML layouts)
-- **Hilt** dependency injection
-- **DataStore Preferences** (split across app prefs / paired devices / host profiles)
-- **BluetoothHidDevice** API for HID reports
-- **MVVM** with one ViewModel per screen
-- **Foreground Service** owns the HID profile proxy + device connection lifecycle
-- Min SDK 28 · Target SDK 35
-
----
-
-## Architecture
-
-```
-app/
-├── bluetooth/         HID descriptor, report sender, service, scan manager, QS tile
-├── data/              Preferences, paired-device cache, host profiles
-+-- sensor/            (disabled; air mouse removed)
-└── ui/
-    ├── components/    Connection bar, glass card, mouse buttons, sliders, toggles
-    ├── navigation/    Compose nav graph
-�   +-- screens/       Touchpad / Keyboard / Media / TV / Connect / Settings / Onboarding
-    └── theme/         Material3 color, typography
+Release:
+```bash
+./gradlew assembleRelease
 ```
 
-The HID descriptor is a byte-exact combo (Boot Keyboard + 5-button mouse with AC Pan + Consumer control). Mouse polling runs at ~125 Hz to match commercial HID devices. Keyboard input uses 6-key rollover with mutex-guarded slot allocation.
+## Usage
 
----
+1. Open PadKeys, make the phone discoverable (Connect tab).
+2. On the host, scan Bluetooth and pair with "PadKeys".
+3. In PadKeys, tap Reconnect.
+4. Use Touchpad or Keyboard tabs.
 
-## Privacy
+## Compatibility
 
-PadKeys never connects to the internet. All Bluetooth traffic is local. Only data stored:
-
-- A list of recently paired devices (name + MAC), kept on-device.
-- Your settings (speeds, toggles, theme).
-- Host profiles you create.
-
-Nothing leaves your phone.
-
----
-
-## Contributing
-
-Issues and pull requests welcome. Before submitting:
-
-1. Run `./gradlew lint` and `./gradlew test`.
-2. Keep diffs focused — one feature or fix per PR.
-3. If you touch the HID descriptor, **re-pair every test host** before retesting (hosts cache the descriptor at bond time).
-
----
+- Works best with Windows 10/11, macOS, Linux, iPadOS, Android TV, smart TVs.
+- Android phones as host are usually not supported.
+- Some OEMs disable Bluetooth HID device profile.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
-
----
-
-## Author
-
-**PadKeys**
-Based on Linkpad by Devdas Kumar (MIT) - https://github.com/Devdas-gupta/linkpad
-If PadKeys saved you a Bluetooth dongle, a star on the repo is appreciated. ⭐
-
-
+MIT. Based on Linkpad by Devdas Kumar (https://github.com/Devdas-gupta/linkpad). Shoutout to the original project.

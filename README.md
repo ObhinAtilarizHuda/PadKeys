@@ -26,7 +26,7 @@ PadKeys turns the phone already in your pocket into an emergency keyboard, prese
 ## Features
 
 - **Touchpad** - move the pointer, tap to click, right-click, and scroll.
-- **Full keyboard** - QWERTY layout with number row, F1-F12, symbols, arrows, Tab, Caps Lock, Shift, Ctrl, Alt, and Enter. Opens in landscape for comfortable typing.
+- **Two keyboard layouts** - a phone-style QWERTY keyboard in portrait by default, or a full laptop-style keyboard with number row, F1-F12, arrows, and modifiers that opens in landscape. Switch layouts in Settings > Keyboard.
 - **Media and TV controls** - playback shortcuts and TV navigation keys.
 - **Simple pairing** - make the phone discoverable, pair from the host, then reconnect from the app.
 - **Auto-reconnect** - remembers the last paired host.

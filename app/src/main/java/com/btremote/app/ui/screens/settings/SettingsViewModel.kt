@@ -66,4 +66,5 @@ class SettingsViewModel @Inject constructor(
     fun addProfile(name: String, os: String) = viewModelScope.launch { profileRepo.addProfile(name, os) }
     fun removeProfile(id: String) = viewModelScope.launch { profileRepo.removeProfile(id) }
     fun setShowCustomShortcuts(v: Boolean) = viewModelScope.launch { prefs.setShowCustomShortcuts(v) }
+    fun setKeyboardLayout(v: String) = viewModelScope.launch { prefs.setKeyboardLayout(v) }
 }

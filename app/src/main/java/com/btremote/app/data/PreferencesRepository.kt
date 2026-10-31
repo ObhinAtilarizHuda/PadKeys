@@ -106,7 +106,8 @@ data class AppPreferences(
     /** User-defined custom shortcut buttons. */
     val customShortcuts: List<CustomShortcut>,
     /** True to show the custom shortcuts row in KeyboardScreen. */
-    val showCustomShortcuts: Boolean
+    val showCustomShortcuts: Boolean,
+    val keyboardLayout: String
 ) {
     companion object {
         val DEFAULT = AppPreferences(
@@ -142,7 +143,8 @@ data class AppPreferences(
             backgroundServiceNotification = false,
             onboardingComplete = false,
             customShortcuts = emptyList(),
-            showCustomShortcuts = false
+            showCustomShortcuts = false,
+            keyboardLayout = "phone"
         )
     }
 }
@@ -187,6 +189,7 @@ class PreferencesRepository @Inject constructor(
         val ONBOARDING_COMPLETE    = booleanPreferencesKey("onboarding_complete")
         val CUSTOM_SHORTCUTS       = stringPreferencesKey("custom_shortcuts")
         val SHOW_CUSTOM_SHORTCUTS  = booleanPreferencesKey("show_custom_shortcuts")
+        val KEYBOARD_LAYOUT        = stringPreferencesKey("keyboard_layout")
     }
 
     val preferences: Flow<AppPreferences> = dataStore.data.map { it.toAppPreferences() }
@@ -224,7 +227,8 @@ class PreferencesRepository @Inject constructor(
         backgroundServiceNotification = this[Keys.BACKGROUND_SERVICE_NOTIFICATION] ?: false,
         onboardingComplete        = this[Keys.ONBOARDING_COMPLETE] ?: false,
         customShortcuts           = CustomShortcut.decodeList(this[Keys.CUSTOM_SHORTCUTS] ?: ""),
-        showCustomShortcuts       = this[Keys.SHOW_CUSTOM_SHORTCUTS] ?: false
+        showCustomShortcuts       = this[Keys.SHOW_CUSTOM_SHORTCUTS] ?: false,
+        keyboardLayout            = this[Keys.KEYBOARD_LAYOUT] ?: "phone"
     )
 
     suspend fun setPointerSpeed(value: Int)           = dataStore.edit { it[Keys.POINTER_SPEED] = value }
@@ -261,4 +265,5 @@ class PreferencesRepository @Inject constructor(
     suspend fun setCustomShortcuts(list: List<CustomShortcut>) =
         dataStore.edit { it[Keys.CUSTOM_SHORTCUTS] = CustomShortcut.encodeList(list) }
     suspend fun setShowCustomShortcuts(value: Boolean) = dataStore.edit { it[Keys.SHOW_CUSTOM_SHORTCUTS] = value }
+    suspend fun setKeyboardLayout(value: String) = dataStore.edit { it[Keys.KEYBOARD_LAYOUT] = value }
 }

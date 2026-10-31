@@ -99,15 +99,17 @@ fun HomeScreen(
     val state       by viewModel.connectionState.collectAsStateWithLifecycle()
     val quick       by viewModel.quickPairTarget.collectAsStateWithLifecycle()
     val pairedHistory by viewModel.pairedHistory.collectAsStateWithLifecycle()
+    val keyboardLayout by viewModel.keyboardLayout.collectAsStateWithLifecycle()
     var current     by remember { mutableStateOf(Tab.Touchpad) }
 
     val context = LocalContext.current
-    DisposableEffect(current) {
+    DisposableEffect(current, keyboardLayout) {
         val activity = context as? Activity
-        if (current == Tab.Keyboard) {
-            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        val landscape = current == Tab.Keyboard && keyboardLayout == "laptop"
+        activity?.requestedOrientation = if (landscape) {
+            ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         } else {
-            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         }
         onDispose {
             activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT

@@ -8,6 +8,7 @@ import com.btremote.app.bluetooth.HidServiceController
 import com.btremote.app.data.HostProfileRepository
 import com.btremote.app.data.PairedDeviceEntry
 import com.btremote.app.data.PairedDeviceRepository
+import com.btremote.app.data.PreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,10 +25,15 @@ class HomeViewModel @Inject constructor(
     private val controller: HidServiceController,
     private val btManager: BluetoothManager,
     private val profileRepo: HostProfileRepository,
-    private val pairedRepo: PairedDeviceRepository
+    private val pairedRepo: PairedDeviceRepository,
+    private val prefs: PreferencesRepository
 ) : ViewModel() {
 
     val connectionState: StateFlow<ConnectionState> = controller.connectionState
+
+    val keyboardLayout: StateFlow<String> = prefs.preferences
+        .map { it.keyboardLayout }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "phone")
 
     val pairedHistory: StateFlow<List<PairedDeviceEntry>> = pairedRepo.devices
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())

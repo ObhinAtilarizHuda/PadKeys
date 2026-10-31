@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -78,6 +79,7 @@ fun KeyboardScreen(
     viewModel: KeyboardViewModel = hiltViewModel()
 ) {
     val prefs            by viewModel.preferences.collectAsStateWithLifecycle()
+    val keyboardLayout   = prefs?.keyboardLayout ?: "phone"
     val showShortcutsWin = prefs?.showShortcutsWin ?: false
     val showShortcutsMac = prefs?.showShortcutsMac ?: false
     val showFKeys        = prefs?.showFKeys ?: false
@@ -92,14 +94,25 @@ fun KeyboardScreen(
     var showEditor       by remember { mutableStateOf(false) }
     var editingShortcut  by remember { mutableStateOf<CustomShortcut?>(null) }
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 8.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        QwertyKeyboard(viewModel)
+    if (keyboardLayout == "laptop") {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 8.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            QwertyKeyboard(viewModel)
+        }
+    } else {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(horizontal = 8.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.Bottom
+        ) {
+            PhoneKeyboard(viewModel)
+        }
     }
 
     // Custom shortcut editor dialog

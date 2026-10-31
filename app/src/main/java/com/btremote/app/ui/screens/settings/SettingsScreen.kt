@@ -174,6 +174,21 @@ private fun MouseTab(p: AppPreferences, vm: SettingsViewModel) {
 
 @Composable
 private fun KeyboardTab(p: AppPreferences, vm: SettingsViewModel) {
+    SectionLabel("KEYBOARD LAYOUT")
+    Text(
+        "Phone layout works in portrait. Laptop layout uses the full keyboard in landscape.",
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(horizontal = 16.dp)
+    )
+    Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+        SegmentedRow(
+            options = listOf("Phone" to "phone", "Laptop" to "laptop"),
+            selectedValue = p.keyboardLayout,
+            onSelect = vm::setKeyboardLayout
+        )
+    }
+
     SectionLabel("DEFAULT TARGET OS")
     Text(
         "Used when active profile is set to Auto",

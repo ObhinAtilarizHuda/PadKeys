@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="assets/banner.png" alt="Linkpad — wireless Bluetooth keyboard, mouse and media remote for Android" />
+  <img src="assets/banner.png" alt="PadKeys — wireless Bluetooth keyboard, mouse and media remote for Android" />
 </p>
 
-<h1 align="center">Linkpad</h1>
+<h1 align="center">PadKeys</h1>
 
 <p align="center">
   <em>Turn your Android phone into a wireless keyboard, mouse, and media remote for any Bluetooth host. No companion app on the target device.</em>
@@ -14,7 +14,7 @@
   <a href="https://developer.android.com/"><img alt="Min SDK" src="https://img.shields.io/badge/minSdk-28-1976D2" /></a>
   <a href="https://developer.android.com/"><img alt="Target SDK" src="https://img.shields.io/badge/targetSdk-35-1976D2" /></a>
   <a href="https://kotlinlang.org/"><img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-Compose-7F52FF?logo=kotlin&logoColor=white" /></a>
-  <a href="https://github.com/Devdas-gupta/linkpad/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/Devdas-gupta/linkpad?color=00E5C3&label=release" /></a>
+  <a href="https://github.com/ObhinAtilarizHuda/PadKeys/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/ObhinAtilarizHuda/PadKeys?color=00E5C3&label=release" /></a>
   <a href="#license"><img alt="License" src="https://img.shields.io/badge/license-MIT-lightgrey" /></a>
 </p>
 
@@ -28,13 +28,13 @@
   </a>
 </p>
 
-Or grab the latest APK directly from [GitHub Releases](https://github.com/Devdas-gupta/linkpad/releases/latest).
+Or grab the latest APK directly from [GitHub Releases](https://github.com/ObhinAtilarizHuda/PadKeys/releases/latest).
 
 ---
 
 ## Overview
 
-**Linkpad** is a Bluetooth HID controller built natively for Android. It pairs with any host that supports Classic Bluetooth — macOS, Windows, Linux, iPadOS, Android TV, and most smart TVs — and shows up as a generic combo keyboard + mouse. The host doesn't need any driver, helper app, or pairing code beyond the standard Bluetooth flow.
+**PadKeys** is a Bluetooth HID controller built natively for Android. It pairs with any host that supports Classic Bluetooth — macOS, Windows, Linux, iPadOS, Android TV, and most smart TVs — and shows up as a generic combo keyboard + mouse. The host doesn't need any driver, helper app, or pairing code beyond the standard Bluetooth flow.
 
 Use it as a silent remote for your living-room TV, a backup keyboard when yours dies mid-meeting, or a desk-side trackpad when you want your laptop closed.
 
@@ -44,7 +44,6 @@ Use it as a silent remote for your living-room TV, a backup keyboard when yours 
 
 - **Touchpad** — laptop-class trackpad with 1-finger move, 2-finger scroll (vertical + horizontal AC Pan), 2-finger tap right-click, tap-to-drag, and a precision right-edge scroll strip.
 - **Software keyboard** — relays your typing to the host in real time. Optional Shortcuts row (Cmd / Ctrl + C/V/X/Z/A, Alt+Tab), F-keys, Edit cluster (Backspace / Del / Home / End / PgUp / PgDn / Insert), and Arrow cluster.
-- **Air mouse** — gyroscope-driven cursor with drift-free Game Mode (sensor fusion) and a low-pass filter fallback. Works globally in the background across all screens (e.g., while typing on the keyboard). Features adjustable sensitivity, noise dead zone, non-linear acceleration curve, axis invert, and per-button visibility.
 - **Media remote** — brightness, volume, mute, prev/next track, play/pause, plus press-and-hold FF/RW for continuous seeking.
 - **TV Remote** — dedicated tab with D-Pad ring, system keys (Back / Home / Menu), volume & channel controls, colour function keys (F1–F4), Power & Input/Source buttons, and a numeric keypad.
 - **Multi-host profiles** — save Mac / PC / iPad / TV profiles, each with its own target-OS layout and last-connected device. Switch in one tap.
@@ -60,7 +59,7 @@ See [changelog.md](changelog.md) for the full detailed changelog.
 
 ## Screens
 
-| Touchpad | Keyboard | Air Mouse |
+| Touchpad | Keyboard |
 | :-: | :-: | :-: |
 | Trackpad surface + edge scroll strip | Live typing relay + chip rows | Gyro cursor visualizer + click row |
 
@@ -100,12 +99,12 @@ Make sure you have JDK 17+ installed, then build the debug APK using:
 
 ## Pair with a host
 
-1. Open Linkpad → **Connect** tab → tap **Scan**.
-2. Pick the device from the list (bonded devices appear first).
-3. On the host, accept the pairing request (Linkpad shows up as a combo keyboard + mouse named **Linkpad**).
-4. Done. Switch back to Touchpad / Keyboard / Media — anything you do is mirrored to the host instantly.
+1. Make the phone discoverable (Connect tab -> "MAKE PHONE DISCOVERABLE").
+2. On the host (PC/TV), scan Bluetooth and pair with "PadKeys" (POCO C71 etc.).
+3. In PadKeys, tap Reconnect to the paired host. Done.
 
-After the first pair, the active profile remembers the device. Tap **QUICK** on the connection bar next launch — no scan needed.
+
+After pairing, PadKeys auto-reconnects to the last host when possible.
 
 ### Tested hosts
 
@@ -138,11 +137,11 @@ After the first pair, the active profile remembers the device. Tap **QUICK** on 
 app/
 ├── bluetooth/         HID descriptor, report sender, service, scan manager, QS tile
 ├── data/              Preferences, paired-device cache, host profiles
-├── sensor/            Gyroscope reader for air mouse
++-- sensor/            (disabled; air mouse removed)
 └── ui/
     ├── components/    Connection bar, glass card, mouse buttons, sliders, toggles
     ├── navigation/    Compose nav graph
-    ├── screens/       Touchpad / Keyboard / AirMouse / Media / TV / Connect / Settings / Onboarding
+�   +-- screens/       Touchpad / Keyboard / Media / TV / Connect / Settings / Onboarding
     └── theme/         Material3 color, typography
 ```
 
@@ -152,7 +151,7 @@ The HID descriptor is a byte-exact combo (Boot Keyboard + 5-button mouse with AC
 
 ## Privacy
 
-Linkpad never connects to the internet. All Bluetooth traffic is local. Only data stored:
+PadKeys never connects to the internet. All Bluetooth traffic is local. Only data stored:
 
 - A list of recently paired devices (name + MAC), kept on-device.
 - Your settings (speeds, toggles, theme).
@@ -180,6 +179,8 @@ MIT — see [LICENSE](LICENSE).
 
 ## Author
 
-**Devdas Kumar** · [@Devdas-gupta](https://github.com/Devdas-gupta)
+**PadKeys**
+Based on Linkpad by Devdas Kumar (MIT) - https://github.com/Devdas-gupta/linkpad
+If PadKeys saved you a Bluetooth dongle, a star on the repo is appreciated. ⭐
 
-If Linkpad saved you a Bluetooth dongle, a star on the repo is appreciated. ⭐
+

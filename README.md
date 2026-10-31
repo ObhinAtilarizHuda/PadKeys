@@ -12,6 +12,17 @@ PadKeys uses Android's built-in Bluetooth HID Device profile, so the host sees a
 ![Compose](https://img.shields.io/badge/Compose-Material%203-4285F4)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
+## Why PadKeys?
+
+You know the moment:
+
+- You sit down at a meeting and realize the keyboard is still at home.
+- You are presenting, but there is no pointer on screen.
+- The TV remote is missing and the laptop is across the room.
+- Your laptop touchpad dies right before you need it.
+
+PadKeys turns the phone already in your pocket into an emergency keyboard, presentation remote, and trackpad. Pair once, open the app, and type or point from anywhere in the room.
+
 ## Features
 
 - **Touchpad** - move the pointer, tap to click, right-click, and scroll.
